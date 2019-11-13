@@ -66,9 +66,16 @@ ca (Sub a1 a2)  = (ca a2) ++ (ca a1) ++ [SUB]
 ca (Mult a1 a2) = (ca a2) ++ (ca a1) ++ [MULT]
 
 cb :: Bexp -> Code
-cb TRUE = [AM_TRUE]
-cb FALSE = [AM_FALSE]
-cb (Neg b) = (cb b) ++ [NEG]
+cb TRUE        = [AM_TRUE]
+cb FALSE       = [AM_FALSE]
+cb (Neg b)     = (cb b) ++ [NEG]
 cb (And b1 b2) = (cb b2) ++ (cb b1) ++ [AND]
-cb (Eq a1 a2) = (ca a2) ++ (ca a1) ++ [EQUALS]
-cb (Le a1 a2) = (ca a2) ++ (ca a1) ++ [LE]
+cb (Eq a1 a2)  = (ca a2) ++ (ca a1) ++ [EQUALS]
+cb (Le a1 a2)  = (ca a2) ++ (ca a1) ++ [LE]
+
+cs :: Stm -> Code
+cs (Ass v a) = (ca a) ++ [STORE v]
+cs (Skip) = [NOOP]
+cs (Comp s1 s2) = (cs s1) ++ (cs s2)
+cs (If b s1 s2) = (cb b) ++ [BRANCH (cs s1) (cs s2)]
+cs (While b s) = [LOOP (cb b) (cs s)]
