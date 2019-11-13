@@ -7,12 +7,14 @@ data Inst = PUSH Num | ADD | MULT | SUB | AM_TRUE | AM_FALSE | EQUALS | LE | AND
 
 type Code = [Inst]
 
+type Storage = State
+
 data Expression = INT Z | BOOL T 
     deriving(Show)
 
 type Stack = [Expression]
 
-type Config = (Code, Stack, State)
+type Config = (Code, Stack, Storage)
 
 am_step :: Config -> Config
 am_step ([], e, s) = ([], e, s)
@@ -80,14 +82,14 @@ cs (Comp s1 s2) = (cs s1) ++ (cs s2)
 cs (If b s1 s2) = (cb b) ++ [BRANCH (cs s1) (cs s2)]
 cs (While b s) = [LOOP (cb b) (cs s)]
 
-f :: Stm
-f = (Comp(Ass "y" (N 1)) (While (Neg (Eq (V "x")(N 1)))(Comp(Ass "y" (Mult (V "y") (V "x")))(Ass "x" (Sub (V "x") (N 1))))))
+testStatement :: Stm
+testStatement = (Comp(Ass "y" (N 1)) (While (Neg (Eq (V "x")(N 1)))(Comp(Ass "y" (Mult (V "y") (V "x")))(Ass "x" (Sub (V "x") (N 1))))))
 
-p :: Code
-p = [PUSH 1,STORE "y",LOOP [PUSH 1, FETCH  "x", EQUALS, NEG][FETCH  "x", FETCH  "y", MULT, STORE "y",PUSH 1, FETCH  "x", SUB, STORE "x"]]
+testCode :: Code
+testCode = [PUSH 1,STORE "y",LOOP [PUSH 1, FETCH  "x", EQUALS, NEG][FETCH  "x", FETCH  "y", MULT, STORE "y",PUSH 1, FETCH  "x", SUB, STORE "x"]]
 
-s :: State
-s "x" = 3
+testStorage :: Storage
+testStorage "x" = 3
 
-q1 = map (run p s) ["x","y"] -- = [1,6]
-q2 = p == cs f -- = True
+q1 = map (run testCode testStorage) ["x","y"] -- = [1,6]
+q2 = testCode == cs testStatement -- = True
