@@ -4,9 +4,13 @@ module OperationalSemantics(
     Z,
     T,
     State,
+    Aexp (..),
+    Bexp (..),
+    Stm (..),
     n_val,
     a_val,
     b_val,
+    update,
     s_ns
 )
 where
