@@ -1,5 +1,5 @@
 import Prelude hiding (Num)
-import OperationalSemantics
+import BaseTypes
 
 data Inst = PUSH Num | ADD | MULT | SUB | AM_TRUE | AM_FALSE | EQUALS | LE | AND | NEG | FETCH Var | STORE Var |
             NOOP | BRANCH Code Code | LOOP Code Code
@@ -19,7 +19,7 @@ type Config = (Code, Stack, Storage)
 am_step :: Config -> Config
 am_step ([], e, s) = ([], e, s)
 am_step ((PUSH n):c, e, s) = (c, n_expr:e, s) where
-    n_expr = INT (n_val n)
+    n_expr = INT n
 am_step (ADD:c, (INT z1):(INT z2):e, s) = (c, n_expr:e, s) where
     n_expr = INT (z1 + z2)
 am_step (MULT:c, (INT z1):(INT z2):e, s) = (c, n_expr:e, s) where
