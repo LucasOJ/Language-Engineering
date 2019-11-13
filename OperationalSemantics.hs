@@ -1,8 +1,5 @@
 import BaseTypes
 
-p :: Stm
-p = Comp (Ass "z" (N 0)) (While (Le (V "y") (V "x")) (Comp (Ass "z" (Add (V "z") (N 1))) (Ass "x" (Sub (V "x") (V "y")))))
-
 s :: State
 s "x" = 1
 s "y" = 2
@@ -33,3 +30,6 @@ ns_stm (Inter skip s) = Final s
 s_ns :: Stm -> State -> State
 s_ns stm s = s' where
     Final s' = ns_stm $ Inter stm s
+
+testStatement1 :: Stm
+testStatement1 = Comp (Ass "z" (N 0)) (While (Le (V "y") (V "x")) (Comp (Ass "z" (Add (V "z") (N 1))) (Ass "x" (Sub (V "x") (V "y")))))
