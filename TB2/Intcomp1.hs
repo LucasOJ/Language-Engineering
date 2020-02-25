@@ -351,6 +351,10 @@ tcomp (Let x erhs ebody) cenv
       in  TLet (tcomp erhs cenv) (tcomp ebody cenv1)
 tcomp (Prim op e1 e2) cenv
     = TPrim op (tcomp e1 cenv) (tcomp e2 cenv)
+tcomp (SeqLet [] ebody) cenv = tcomp ebody cenv
+tcomp (SeqLet ((x, expr):xs) ebody) cenv =
+    let cenv1 = (x:cenv)
+    in TLet (tcomp expr cenv) (tcomp (SeqLet xs ebody) cenv1)
 
 -- | Evaluation of target expressions with variable indexes. The
 --   run-time environment renv is a list of variable values (ints).
@@ -425,6 +429,7 @@ data SInstr = SCstI Int     -- push integer
             | SMul          -- pop args, push product
             | SPop          -- pop value/unbind var
             | SSwap         -- exchange top and next
+            deriving (Show)
 
 
 seval :: [SInstr] -> [Int] -> Int 
@@ -485,6 +490,9 @@ assemble (x:xs)
                  SMul    -> (4:xs')
                  SPop    -> (5:xs')
                  SSwap   -> (6:xs')
+
+sbyte :: Expr -> [StackValue] -> [Int] 
+sbyte expr = assemble . (scomp expr)
 
 scompeval :: Expr -> [StackValue] -> IO ()
 scompeval x = flip intsToFile "fname" . assemble . scomp x
